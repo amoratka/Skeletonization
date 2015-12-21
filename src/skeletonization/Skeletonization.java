@@ -6,6 +6,8 @@
 package skeletonization;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 
@@ -16,12 +18,16 @@ import javax.swing.SwingUtilities;
 public class Skeletonization {
 public static void main(String[] args) throws IOException, InterruptedException {
         SwingUtilities.invokeLater(new Runnable() {
-            @Override
+
             public void run() {
-                Wyświetlacz w = new Wyświetlacz();
+                Wyświetlacz w = null;
+                try {
+                    w = new Wyświetlacz();
+                } catch (IOException ex) {
+                    Logger.getLogger(Skeletonization.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 w.setVisible(true);
             }
-
         });
 
     }
