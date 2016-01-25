@@ -1,29 +1,31 @@
 package skeletonization;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.border.LineBorder;
-import static skeletonization.PointsMatrixesContainer.print_container;
 import static skeletonization.Image.to_grey_scale;
 import static skeletonization.Image.write_image;
 import static skeletonization.Image.grey_scale_image_to_point_matrix;
 import static skeletonization.Image.point_matrix_to_image;
 import static skeletonization.PointsMatrix.points_matrix_to_elements_container;
-import static skeletonization.PointsMatrix.print_pointsmatrix;
-import static skeletonization.PointsMatrix.elements_container_to_points_matrix;
-import static skeletonization.PointsMatrix.is_similar;
 import static skeletonization.PointsMatrix.make_skeleton;
-import static skeletonization.PointsMatrix.rotate_points_matrix;
 
 public class Wyświetlacz extends javax.swing.JFrame {
 
@@ -34,15 +36,25 @@ public class Wyświetlacz extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JFileChooser fileChooser;
-    //public Siatka siatka = new Siatka();
+   
     RysujPanel panel = new RysujPanel();
-    public JButton start;
+    RysujPanel panel2 = new RysujPanel();
+    public JButton togreyscale;
     public JButton skeleton;
-    public int background_color =255;
-    // public ObsługaSiatki obsługa = new ObsługaSiatki();
+    public JButton write;
+    public int backgroundColor = 255;
+   
     private JButton returner;
     Image originalImage;
     Image greyImage;
+    RadioListener RadioListener;
+
+    JRadioButton white;
+    JRadioButton black;
+
+    private JLabel headerLabel;
+    private JPanel northpanel;
+    private JPanel northpanel1;
 
     public Wyświetlacz() throws IOException {
         originalImage = new Image();
@@ -50,61 +62,46 @@ public class Wyświetlacz extends javax.swing.JFrame {
         //tymczasowo wyłaczone do zakończenia fazy prób i błędów
         initComponents();
 
-        //do rozbicia na przyciski i w ogole do GUI, robocze
-        /* File imageFile;
-        //   imageFile = new File("lenna.bmp");
-        imageFile = new File("reka.jpg");
-
-       originalImage.image = ImageIO.read(imageFile);
-
-        panel.image = originalImage.image;
-
-        // write_image(originalImage.image);
-        greyImage.image = to_grey_scale(panel.image);
-        panel.image = greyImage.image;
-        // write_image(panel.image);
-        panel.repaint();
-
-        PointsMatrix matrix;
-
-        matrix = new PointsMatrix(panel.image.getWidth(), panel.image.getHeight());
-
-        matrix = grey_scale_image_to_point_matrix(panel.image);
-        PointsMatrixesContainer elementsContainer = new PointsMatrixesContainer(matrix.width, matrix.height);
-        elementsContainer = points_matrix_to_elements_container(matrix);
-        boolean change = true;
-        Pair pair = new Pair(matrix.width, matrix.height);
-
-      while (pair.change == true)  
-        //for (int i = 0; i < 200; i++) 
-      {
-            pair = make_skeleton(elementsContainer);
-            elementsContainer = points_matrix_to_elements_container(pair.image);
-            // System.out.println(pair.change);
-        }
-            //print_container(elementsContainer);
-
-        panel.image = point_matrix_to_image(pair.image);*/
-       // write_image(panel.image);
-
+        
     }
 
     private void initComponents() {
         this.setLayout(new FlowLayout());
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        //jScrollPane1 = new javax.swing.JScrollPane();
+      //  jTextArea1 = new javax.swing.JTextArea();
         jMenuBar = new javax.swing.JMenuBar();
         jMenu = new javax.swing.JMenu();
         Open = new javax.swing.JMenuItem();
         Exit = new javax.swing.JMenuItem();
         fileChooser = new JFileChooser();
+        //panel z wyborem koloru tła
+        
+        JPanel northPanel = new JPanel(new GridLayout(2, 1));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        JPanel backgroundColorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        backgroundColorPanel.add(new JLabel("Kolor tła : "));
+        northPanel.add(backgroundColorPanel);
 
-        /*jTextArea1.setColumns(20);
-         jTextArea1.setRows(5);
-         jScrollPane1.setViewportView(jTextArea1);
-         */
+        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        white = new JRadioButton("biały");
+        black = new JRadioButton("czarny");
+        white.setSelected(true);
+        ButtonGroup group = new ButtonGroup();
+        group.add(white);
+        group.add(black);
+
+        radioPanel.add(white);
+        radioPanel.add(black);
+
+        northPanel.add(radioPanel);
+
+        RadioListener = new RadioListener();
+        white.addActionListener(RadioListener);
+
+        black.addActionListener(RadioListener);
+
+        //jMenuBar    
         jMenu.setText("Opcje");
 
         Open.setText("Otwórz");
@@ -120,31 +117,38 @@ public class Wyświetlacz extends javax.swing.JFrame {
         jMenu.add(Open);
 
         Exit.setText("Wyjdź");
-        jMenu.add(Exit);
 
+        Exit.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        jMenu.add(Exit);
         jMenuBar.add(jMenu);
 
         setJMenuBar(jMenuBar);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        start = new JButton("To greyscale");
-        start.setPreferredSize(new Dimension(100, 100));
-        this.add(start);
+        //przyciska zamiany do skali szarości
+        togreyscale = new JButton("To greyscale");
+        togreyscale.setPreferredSize(new Dimension(100, 100));
 
-        start.addMouseListener(new java.awt.event.MouseAdapter() {
+        togreyscale.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 try {
                     startMouseClicked(evt);
 
-                } catch (InterruptedException | IOException | IllegalArgumentException ex ) {
+                } catch (InterruptedException | IOException | IllegalArgumentException ex) {
                     Logger.getLogger(Wyświetlacz.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
-
+        //przycisk wyświetlenia obrazka w orginalnych kolorach
         returner = new JButton("return to normal");
         returner.setPreferredSize(new Dimension(100, 100));
-        this.add(returner);
 
         returner.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -157,10 +161,9 @@ public class Wyświetlacz extends javax.swing.JFrame {
                 }
             }
         });
-
+        //przycisk wywołujący szkieletyzację
         skeleton = new JButton("To skeleton");
         skeleton.setPreferredSize(new Dimension(100, 100));
-        this.add(skeleton);
 
         skeleton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -170,14 +173,43 @@ public class Wyświetlacz extends javax.swing.JFrame {
 
         });
 
-        //  panel.siatka = siatka;
-        panel.setBorder(new LineBorder(Color.black, 1, true));
+        //przycisk zapisujący obrazek do folderu pod nazwą greyscale.bmp
+        write = new JButton("Write");
+        write.setPreferredSize(new Dimension(100, 100));
+
+        write.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                startMouseClickedWrite(evt);
+            }
+
+        });
+        //panel z przyciskami
+        JPanel middlePanel = new JPanel(new GridLayout(2, 2));
+
+        middlePanel.add(togreyscale);
+        middlePanel.add(returner);
+        middlePanel.add(skeleton);
+        middlePanel.add(write);
+        
+        //panel z obrazkami 
+        panel.setBorder(new LineBorder(Color.white, 1, true));
         panel.setBounds(0, 0, 100, 100);
         panel.setLayout(new GridLayout());
-        panel.setPreferredSize(new Dimension(1000, 500));
-        this.add(panel);
+        panel.setPreferredSize(new Dimension(500, 500));
+        
+        panel2.setBorder(new LineBorder(Color.white, 1, true));
+        panel2.setBounds(0, 0, 100, 100);
+        panel2.setLayout(new GridLayout());
+        panel2.setPreferredSize(new Dimension(500, 500));
 
-        pack();
+        //układanie paneli   
+        this.add(panel);
+        this.add(panel2);
+        this.add(northPanel, BorderLayout.NORTH);
+        this.add(middlePanel, BorderLayout.CENTER);
+        this.setPreferredSize(new Dimension(1500,700));
+       this.pack();
     }
 
     private void OpenActionPerformed(java.awt.event.ActionEvent evt) throws IOException {
@@ -201,41 +233,66 @@ public class Wyświetlacz extends javax.swing.JFrame {
 
     private void startMouseClicked(java.awt.event.MouseEvent evt) throws InterruptedException, IOException {
 
-        write_image(originalImage.image);
+        //write_image(originalImage.image);
         greyImage.image = to_grey_scale(panel.image);
         panel.image = greyImage.image;
-        write_image(originalImage.image);
-        panel.repaint();
+        //write_image(originalImage.image);
+        
+        panel.setPreferredSize(new Dimension(panel.image.getWidth(), panel.image.getHeight()));panel.repaint();
 
     }
 
     private void startMouseClickedReturn(java.awt.event.MouseEvent evt) throws InterruptedException, IOException {
         panel.image = originalImage.image;
-        write_image(originalImage.image);
+        //write_image(originalImage.image);
+        panel.setPreferredSize(new Dimension(panel.image.getWidth(), panel.image.getHeight()));
+     
         panel.repaint();
     }
 
     private void startMouseClickedSkeleton(MouseEvent evt) {
-         PointsMatrix matrix;
+        PointsMatrix matrix;
 
         matrix = new PointsMatrix(panel.image.getWidth(), panel.image.getHeight());
 
-        matrix = grey_scale_image_to_point_matrix(panel.image);
+        matrix = grey_scale_image_to_point_matrix(greyImage.image, backgroundColor);
         PointsMatrixesContainer elementsContainer = new PointsMatrixesContainer(matrix.width, matrix.height);
         elementsContainer = points_matrix_to_elements_container(matrix);
         boolean change = true;
         Pair pair = new Pair(matrix.width, matrix.height);
 
-      while (pair.change == true)  
-        //for (int i = 0; i < 200; i++) 
-      {
+        while (pair.change == true) 
+        {
             pair = make_skeleton(elementsContainer);
             elementsContainer = points_matrix_to_elements_container(pair.image);
             // System.out.println(pair.change);
         }
-            //print_container(elementsContainer);
+        //print_container(elementsContainer);
 
-        panel.image = point_matrix_to_image(pair.image);
-panel.repaint();//To change body of generated methods, choose Tools | Templates.
+        panel2.image = point_matrix_to_image(pair.image);
+        panel2.setPreferredSize(new Dimension(panel2.image.getWidth(), panel2.image.getHeight()));
+        panel2.repaint();//To change body of generated methods, choose Tools | Templates.
+    }
+
+    class RadioListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            if (white.isSelected()) {
+                backgroundColor = 255;
+
+            } else if (black.isSelected()) {
+                backgroundColor = 0;
+
+            }
+        }
+    }
+
+    private void startMouseClickedWrite(MouseEvent evt) {
+        try {
+            write_image(panel2.image);
+        } catch (IOException ex) {
+            Logger.getLogger(Wyświetlacz.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

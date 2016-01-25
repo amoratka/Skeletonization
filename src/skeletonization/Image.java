@@ -67,9 +67,8 @@ public class Image {
         return image3;
     }
 
-
     // sprowadzenie obrazka ze skali szarości do macierzy punktów z współrzędnymi i wartością punktu
-    public static PointsMatrix grey_scale_image_to_point_matrix(BufferedImage image) {
+    public static PointsMatrix grey_scale_image_to_point_matrix(BufferedImage image, int backgroundColor) {
         int width;
         int height;
         width = image.getWidth();
@@ -78,7 +77,7 @@ public class Image {
         int pom = 0;
         int pixelColor = 0;
         int count = 0;
-       
+
         for (int i = 0; i < width; i++) {
 
             for (int j = 0; j < height; j++) {
@@ -91,12 +90,22 @@ public class Image {
                     //System.out.println("te same wartosci");
                     pixelColor = (int) c.getRed();
                     count++;
-
-                    if (pixelColor > 128) {
-                        pom = 255;
-                    } else {
-                        pom = 0;
+                    if (backgroundColor == 255) {
+                        if (pixelColor > 128) {
+                            pom = 255;
+                        } else {
+                            pom = 0;
+                        }
                     }
+                    else 
+                        {
+                        if (pixelColor > 128) {
+                            pom = 0;
+                        } else {
+                            pom = 255;
+                        }
+                    }
+
                     matrix.matrix[i][j].p = pom;
                     matrix.matrix[i][j].x = i;
                     matrix.matrix[i][j].y = j;
