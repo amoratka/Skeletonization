@@ -37,7 +37,7 @@ public class PointsMatrix {
     }
 
 //macierz na kontener elementów
-    public static PointsMatrixesContainer points_matrix_to_elements_container(PointsMatrix matrix) {
+    public static PointsMatrixesContainer points_matrix_to_elements_container(PointsMatrix matrix, int zmienna) {
 
         int width;
         int height;
@@ -83,7 +83,7 @@ public class PointsMatrix {
 
                         } else {
                             //tu smienione kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk z 0
-                            pom = 255;
+                            pom = zmienna;
                         }
                         //  System.out.println("pom: "+ pom+" color " +pixelColor);
                         pointsMatrix.matrix[w][k].p = pom;
@@ -128,23 +128,22 @@ public class PointsMatrix {
 
     }
 
-    public static boolean compare(PointsMatrix matrix) {
+    public static boolean compare_black(PointsMatrix matrix) {
         int[][] tab = new int[3][3];
-        tab[0][0] = 255;
-        tab[0][1] = 255;
-        tab[0][2] = 255;
+        tab[0][0] = 0;
+        tab[0][1] = 0;
+        tab[0][2] = 0;
         tab[1][0] = 4;
-        tab[1][1] = 0;
+        tab[1][1] = 255;
         tab[1][2] = 4;
-        tab[2][0] = 0;
-        tab[2][1] = 0;
-        tab[2][2] = 0;
-        
-        
+        tab[2][0] = 255;
+        tab[2][1] = 255;
+        tab[2][2] = 255;
+
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                if (i != 1&&i!=0) {
-                   // System.out.println("i: " + i + " j: " + j);
+                if (i != 1 && i != 0) {
+                    // System.out.println("i: " + i + " j: " + j);
                     // System.out.println(tab[i][j] + " " + matrix.matrix[i][j].p);
                     if (tab[i][j] != matrix.matrix[i][j].p) {
                         return false;
@@ -182,12 +181,69 @@ public class PointsMatrix {
 
     }
 
-    public static boolean is_similar(PointsMatrix matrix) {
+    public static boolean compare_white(PointsMatrix matrix) {
+        int[][] tab = new int[3][3];
+        tab[0][0] = 255;
+        tab[0][1] = 255;
+        tab[0][2] = 255;
+        tab[1][0] = 4;
+        tab[1][1] = 0;
+        tab[1][2] = 4;
+        tab[2][0] = 0;
+        tab[2][1] = 0;
+        tab[2][2] = 0;
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (i != 1 && i != 0) {
+                    // System.out.println("i: " + i + " j: " + j);
+                    // System.out.println(tab[i][j] + " " + matrix.matrix[i][j].p);
+                    if (tab[i][j] != matrix.matrix[i][j].p) {
+                        return false;
+                    }
+                } else if (j != 0 && j != 2) {
+                    //System.out.println("i: " + i + " j: " + j);
+                    //System.out.println(tab[i][j] + " " + matrix.matrix[i][j].p);
+                    if (tab[i][j] != matrix.matrix[i][j].p) {
+                        return false;
+                    }
+
+                }
+            }
+        }
+        /* for (int i = 0; i < 3; i++) {
+         for (int j = 0; j < 3; j++) {
+         if (i != 1) {
+         // System.out.println("i: " + i + " j: " + j);
+         // System.out.println(tab[i][j] + " " + matrix.matrix[i][j].p);
+         if (tab[i][j] != matrix.matrix[i][j].p) {
+         return false;
+         }
+         } else if (j != 0 && j != 2) {
+         //System.out.println("i: " + i + " j: " + j);
+         //System.out.println(tab[i][j] + " " + matrix.matrix[i][j].p);
+         if (tab[i][j] != matrix.matrix[i][j].p) {
+         return false;
+         }
+
+         }
+         }
+         }*/
+
+        return true;
+
+    }
+
+    public static boolean is_similar(PointsMatrix matrix, int zmienna) {
         boolean is = false;
         for (int pom = 0; pom < 4; pom++) {
             //System.out.println(pom);
             //  print_pointsmatrix(matrix);
-            is = compare(matrix);
+            if (zmienna == 255) {
+                is = compare_white(matrix);
+            } else {
+                is = compare_black(matrix);
+            }
             if (is == true) {
                 return true;
             }
@@ -196,7 +252,7 @@ public class PointsMatrix {
         return false;
     }
 
-    public static Pair make_skeleton(PointsMatrixesContainer container) {
+    public static Pair make_skeleton(PointsMatrixesContainer container, int zmienna) {
         Pair pair = new Pair(container.width, container.height);
 
         int pom = 0;
@@ -208,16 +264,33 @@ public class PointsMatrix {
                 matrix = container.tab[i][j];
                 pom = matrix.matrix[1][1].p;
                 is = true;
+                if(zmienna==255){
                 if (pom == 0) {
 
-                    is = is_similar(matrix);
+                    is = is_similar(matrix, zmienna);
 
                     if (is == true) {
-                        pom = 255;
+                        
+                            pom = 255;
+                            pair.change = true;
+                        }
+                        
+
+                    }//System.out.println(is+ " "+pair.change);
+                
+                }
+                else//zmienna ==0
+                if (pom == 255) {
+
+                    is = is_similar(matrix, zmienna);
+
+                    if (is == true) 
+                        pom=0;
                         pair.change = true;
 
                     }//System.out.println(is+ " "+pair.change);
-                }
+                
+                
                 pair.image.matrix[i][j].p = pom;
                 pair.image.matrix[i][j].x = i;
                 pair.image.matrix[i][j].y = j;
