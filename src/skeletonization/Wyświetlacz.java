@@ -19,7 +19,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import static skeletonization.Image.to_grey_scale;
 import static skeletonization.Image.write_image;
 import static skeletonization.Image.grey_scale_image_to_point_matrix;
@@ -36,14 +39,15 @@ public class Wyświetlacz extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JFileChooser fileChooser;
-   
+
     RysujPanel panel = new RysujPanel();
     RysujPanel panel2 = new RysujPanel();
     public JButton togreyscale;
     public JButton skeleton;
     public JButton write;
     public int backgroundColor = 255;
-   
+     public int threshold = 128;
+
     private JButton returner;
     Image originalImage;
     Image greyImage;
@@ -62,20 +66,19 @@ public class Wyświetlacz extends javax.swing.JFrame {
         //tymczasowo wyłaczone do zakończenia fazy prób i błędów
         initComponents();
 
-        
     }
 
     private void initComponents() {
         this.setLayout(new FlowLayout());
         //jScrollPane1 = new javax.swing.JScrollPane();
-      //  jTextArea1 = new javax.swing.JTextArea();
+        //  jTextArea1 = new javax.swing.JTextArea();
         jMenuBar = new javax.swing.JMenuBar();
         jMenu = new javax.swing.JMenu();
         Open = new javax.swing.JMenuItem();
         Exit = new javax.swing.JMenuItem();
         fileChooser = new JFileChooser();
         //panel z wyborem koloru tła
-        
+
         JPanel northPanel = new JPanel(new GridLayout(2, 1));
 
         JPanel backgroundColorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -184,6 +187,23 @@ public class Wyświetlacz extends javax.swing.JFrame {
             }
 
         });
+
+        //suwak do skaly szarości
+         JPanel southPanel = new JPanel(new GridLayout(1, 1));
+
+        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        labelPanel.add(new JLabel("Wartość progowa : "));
+        southPanel.add(labelPanel);
+
+        
+        JSlider slider = new JSlider(JSlider.VERTICAL, 0, 255, threshold);
+        slider.setMinorTickSpacing(17);
+        slider.setMajorTickSpacing(85);
+
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        southPanel.add(slider);
+       slider.addChangeListener( new SliderListener());
         //panel z przyciskami
         JPanel middlePanel = new JPanel(new GridLayout(2, 2));
 
@@ -191,25 +211,34 @@ public class Wyświetlacz extends javax.swing.JFrame {
         middlePanel.add(returner);
         middlePanel.add(skeleton);
         middlePanel.add(write);
-        
+
         //panel z obrazkami 
         panel.setBorder(new LineBorder(Color.white, 1, true));
         panel.setBounds(0, 0, 100, 100);
         panel.setLayout(new GridLayout());
         panel.setPreferredSize(new Dimension(500, 500));
-        
+
         panel2.setBorder(new LineBorder(Color.white, 1, true));
         panel2.setBounds(0, 0, 100, 100);
         panel2.setLayout(new GridLayout());
         panel2.setPreferredSize(new Dimension(500, 500));
 
         //układanie paneli   
-        this.add(panel);
-        this.add(panel2);
-        this.add(northPanel, BorderLayout.NORTH);
-        this.add(middlePanel, BorderLayout.CENTER);
-        this.setPreferredSize(new Dimension(1500,700));
-       this.pack();
+        JPanel imagePanel = new JPanel(new FlowLayout());
+        imagePanel.add(panel);
+        imagePanel.add(panel2);
+        this.add(imagePanel,BorderLayout.WEST);
+      //  this.add(panel);
+      //  this.add(panel2);
+        JPanel controlPanel = new JPanel(new FlowLayout());
+        controlPanel.add(southPanel );
+        controlPanel.add(middlePanel);
+        controlPanel.add(northPanel);
+        
+        
+        this.add(controlPanel,BorderLayout.EAST);
+        this.setPreferredSize(new Dimension(1700, 700));
+        this.pack();
     }
 
     private void OpenActionPerformed(java.awt.event.ActionEvent evt) throws IOException {
@@ -237,8 +266,9 @@ public class Wyświetlacz extends javax.swing.JFrame {
         greyImage.image = to_grey_scale(panel.image);
         panel.image = greyImage.image;
         //write_image(originalImage.image);
-        
-        panel.setPreferredSize(new Dimension(panel.image.getWidth(), panel.image.getHeight()));panel.repaint();
+
+        panel.setPreferredSize(new Dimension(panel.image.getWidth(), panel.image.getHeight()));
+        panel.repaint();
 
     }
 
@@ -246,7 +276,7 @@ public class Wyświetlacz extends javax.swing.JFrame {
         panel.image = originalImage.image;
         //write_image(originalImage.image);
         panel.setPreferredSize(new Dimension(panel.image.getWidth(), panel.image.getHeight()));
-     
+
         panel.repaint();
     }
 
@@ -255,14 +285,13 @@ public class Wyświetlacz extends javax.swing.JFrame {
 
         matrix = new PointsMatrix(panel.image.getWidth(), panel.image.getHeight());
 
-        matrix = grey_scale_image_to_point_matrix(greyImage.image, backgroundColor);
+        matrix = grey_scale_image_to_point_matrix(greyImage.image, backgroundColor,threshold);
         PointsMatrixesContainer elementsContainer = new PointsMatrixesContainer(matrix.width, matrix.height);
         elementsContainer = points_matrix_to_elements_container(matrix);
         boolean change = true;
         Pair pair = new Pair(matrix.width, matrix.height);
 
-        while (pair.change == true) 
-        {
+        while (pair.change == true) {
             pair = make_skeleton(elementsContainer);
             elementsContainer = points_matrix_to_elements_container(pair.image);
             // System.out.println(pair.change);
@@ -295,4 +324,14 @@ public class Wyświetlacz extends javax.swing.JFrame {
             Logger.getLogger(Wyświetlacz.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+     class SliderListener implements ChangeListener {
+    public void stateChanged(ChangeEvent e) {
+        JSlider source = (JSlider)e.getSource();
+        
+            threshold = (int)source.getValue();
+            System.out.println("wartosć: "+threshold);
+            
+          
+    }
+}
 }
