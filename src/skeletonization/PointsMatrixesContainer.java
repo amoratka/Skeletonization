@@ -33,7 +33,6 @@ public class PointsMatrixesContainer {
     
     //wypisanie kontenera ( wszystkich elementów strukturalnych )
     public static void print_container(PointsMatrixesContainer sec) {
-        //PointsMatrix elem = new PointsMatrix(3, 3);
         for (int i = 0; i < sec.width; i++) {
 
             for (int j = 0; j < sec.height; j++) {
