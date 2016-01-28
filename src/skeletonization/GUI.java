@@ -30,7 +30,7 @@ import static skeletonization.Image.point_matrix_to_image;
 import static skeletonization.PointsMatrix.points_matrix_to_elements_container;
 import static skeletonization.PointsMatrix.make_skeleton;
 
-public class Wyświetlacz extends javax.swing.JFrame {
+public class GUI extends javax.swing.JFrame {
 
     private javax.swing.JMenuItem Exit;
     private javax.swing.JMenuItem Open;
@@ -40,8 +40,8 @@ public class Wyświetlacz extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JFileChooser fileChooser;
 
-    RysujPanel panel = new RysujPanel();
-    RysujPanel panel2 = new RysujPanel();
+    DrawPanel panel = new DrawPanel();
+    DrawPanel panel2 = new DrawPanel();
 
     public JButton togreyscale;
     public JButton skeleton;
@@ -65,7 +65,7 @@ public class Wyświetlacz extends javax.swing.JFrame {
     public JPanel northpanel;
     public JPanel northpanel1;
 
-    public Wyświetlacz() throws IOException {
+    public GUI() throws IOException {
         originalImage = new Image();
         greyImage = new Image();
         binImage = new Image();
@@ -117,7 +117,7 @@ public class Wyświetlacz extends javax.swing.JFrame {
                 OpenActionPerformed(evt);
 
             } catch (IOException ex) {
-                Logger.getLogger(Wyświetlacz.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         jMenu.add(Open);
@@ -148,7 +148,7 @@ public class Wyświetlacz extends javax.swing.JFrame {
                     startMouseClicked(evt);
 
                 } catch (InterruptedException | IOException | IllegalArgumentException ex) {
-                    Logger.getLogger(Wyświetlacz.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -163,7 +163,7 @@ public class Wyświetlacz extends javax.swing.JFrame {
                     startMouseClickedBin(evt);
 
                 } catch (InterruptedException | IOException ex) {
-                    Logger.getLogger(Wyświetlacz.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -178,7 +178,7 @@ public class Wyświetlacz extends javax.swing.JFrame {
                     startMouseClickedReturner(evt);
 
                 } catch (InterruptedException | IOException ex) {
-                    Logger.getLogger(Wyświetlacz.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -381,7 +381,7 @@ public class Wyświetlacz extends javax.swing.JFrame {
             try {
                 write_image(panel2.image, originalImage.name);
             } catch (IOException ex) {
-                Logger.getLogger(Wyświetlacz.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

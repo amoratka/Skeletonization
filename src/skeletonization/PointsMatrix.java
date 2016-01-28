@@ -48,7 +48,7 @@ public class PointsMatrix {
         PointsMatrix pointsMatrix;
         PointsMatrixesContainer elementsContainer = new PointsMatrixesContainer(width, height);
 
-        int pom = 0;
+        int color = 0;
 
         int pixelColor = 0;
 
@@ -74,11 +74,11 @@ public class PointsMatrix {
 
                         if (row >= 0 && col >= 0 && row < width && col < height) {
                             pixelColor = matrix.matrix[row][col].p;
-                            pom = pixelColor;
+                            color = pixelColor;
                         } else {
-                            pom = 255;
+                            color = 255;
                         }
-                        pointsMatrix.matrix[w][k].p = pom;
+                        pointsMatrix.matrix[w][k].p = color;
                         k++;
                     }
                     k = 0;

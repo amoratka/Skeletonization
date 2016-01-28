@@ -21,9 +21,9 @@ public class Skeletonization {
 
             public void run() {
 
-                Wyświetlacz w = null;
+                GUI w = null;
                 try {
-                    w = new Wyświetlacz();
+                    w = new GUI();
                 } catch (IOException ex) {
                     Logger.getLogger(Skeletonization.class.getName()).log(Level.SEVERE, null, ex);
                 }

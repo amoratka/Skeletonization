@@ -6,13 +6,13 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.swing.JPanel;
 
-class RysujPanel extends JPanel {
+class DrawPanel extends JPanel {
 
     BufferedImage image;
     int width;
     int height;
 
-    public RysujPanel() throws IOException {
+    public DrawPanel() throws IOException {
         super();
 
     }
